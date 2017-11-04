@@ -1,6 +1,10 @@
-package com.example.matthew.fogdemo;
+package com.example.matthew.fogdemo.networkThreads;
 
 import android.util.Log;
+
+import com.example.matthew.fogdemo.MessageQueue;
+import com.example.matthew.fogdemo.messages.TextMessage;
+
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
@@ -23,7 +27,7 @@ public class SendMessagesThread extends Thread {
 
     // Repopulates the MessageQueue with messages in order
     private void repopulateMessages(Queue<String> queue) {
-        Log.d("MESSAGE QUEUE", "Repopulate Message Queue Starting With: " + queue.peek());
+        Log.d("MESSAGE QUEUE", "Repopulate Queue Starting With: " + queue.peek());
         while (!queue.isEmpty()) {
             MessageQueue.getInstance().addMessage(queue.remove());
         }

@@ -1,6 +1,8 @@
-package com.example.matthew.fogdemo;
+package com.example.matthew.fogdemo.networkThreads;
 
 import android.util.Log;
+
+import com.example.matthew.fogdemo.MessageQueue;
 
 import java.io.BufferedReader;
 import java.io.IOException;

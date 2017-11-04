@@ -2,6 +2,8 @@ package com.example.matthew.fogdemo;
 
 import android.util.Log;
 
+import com.example.matthew.fogdemo.messages.TextMessage;
+
 import java.util.LinkedList;
 import java.util.Queue;
 
