@@ -2,7 +2,7 @@ package com.example.matthew.fogdemo;
 
 import android.util.Log;
 
-import com.example.matthew.fogdemo.messages.TextMessage;
+import com.example.matthew.fogdemo.messages.MuleMessage;
 
 import java.util.LinkedList;
 import java.util.Queue;
@@ -11,21 +11,21 @@ import java.util.Queue;
  * Created by Matt on 10/18/2017.
  */
 
-public class MessageQueue {
+public class RegMessageQueue {
 
     private Object lock = new Object();
     private Queue<String> messages;
-    private static MessageQueue messageQueue = null;
+    private static RegMessageQueue messageQueue = null;
     private String fogIP = "";
 
-    private MessageQueue() {
+    private RegMessageQueue() {
         messages = new LinkedList<String>();
     }
 
     // Singleton message queue
-    public static MessageQueue getInstance() {
+    public static RegMessageQueue getInstance() {
         if (messageQueue == null) {
-            messageQueue = new MessageQueue();
+            messageQueue = new RegMessageQueue();
         }
         return messageQueue;
     }
@@ -65,5 +65,9 @@ public class MessageQueue {
             }
         }
         return retQueue;
+    }
+
+    public String getFogIp() {
+        return this.fogIP;
     }
 }

@@ -17,6 +17,7 @@ import com.example.matthew.fogdemo.messages.Message;
 import com.example.matthew.fogdemo.messages.MessageInfo;
 import com.example.matthew.fogdemo.messages.TextMessage;
 import com.example.matthew.fogdemo.networkThreads.FogIPThread;
+import com.example.matthew.fogdemo.networkThreads.MuleThread;
 import com.example.matthew.fogdemo.networkThreads.ReceiveMessagesThread;
 import com.example.matthew.fogdemo.networkThreads.SendMessagesThread;
 
@@ -27,13 +28,14 @@ public class ChatActivity extends AppCompatActivity {
 
     private RecyclerView mMessagesView;
     private EditText mInputMessageView;
+    private EditText mInputDestView;
     private List<Message> mMessages = new ArrayList<Message>();
     private RecyclerView.Adapter mAdapter;
 
 
     //////////////////////////////////////////////////////////////
 
-    private static final String FOG_IP = "128.61.126.81";
+    private static final String FOG_IP = "128.61.114.166";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +50,7 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesView.setAdapter(mAdapter);
 
         mInputMessageView = (EditText) findViewById(R.id.message_input);
+        mInputDestView = (EditText) findViewById(R.id.dest_input);
 
         ImageButton sendButton = (ImageButton) findViewById(R.id.send_button);
         sendButton.setOnClickListener(new View.OnClickListener() {
@@ -71,7 +74,8 @@ public class ChatActivity extends AppCompatActivity {
         ReceiveMessagesThread receiveThread = new ReceiveMessagesThread(this);
         receiveThread.start();
 
-        sendEnterMessage();
+        MuleThread muleThread = new MuleThread();
+        muleThread.start();
     }
 
 
@@ -99,7 +103,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onReceiveTextMessage(String message) {
         TextMessage m = TextMessage.parseMessage(message);
         // Display the new message on the screen
-        addMessage(m.getUsername(), m.getText(), false);
+        addMessage(m.getUsername(), m.getDestName(), m.getText(), false);
     }
 
     // Called by ReceivedMessagesThread when user number message has been received
@@ -108,21 +112,17 @@ public class ChatActivity extends AppCompatActivity {
         message = message.substring(6);
         int num = Integer.parseInt(message);
         String contents = String.format("# of users is %d", num);
-        addMessage("Chatbot", contents, false);
+       // addMessage("Chatbot", SessionInfo.getInstance().getUsername(), contents, false);
     }
 
     /////////////////////////////////////////////////////////////////////////
-    public void sendEnterMessage() {
-        String username = SessionInfo.getInstance().getUsername();
-        String protocolForm = MessageInfo.createEnterMessageString(username);
-        MessageQueue.getInstance().addMessage(protocolForm);
-    }
+
 
     //Sent when the user leaves the chat
     public void sendLeaveMessage() {
         String username = SessionInfo.getInstance().getUsername();
         String protocolForm = MessageInfo.createLeaveMessage(username);
-        MessageQueue.getInstance().addMessage(protocolForm);
+        RegMessageQueue.getInstance().addMessage(protocolForm);
     }
 
     public void attemptSend() {
@@ -130,20 +130,30 @@ public class ChatActivity extends AppCompatActivity {
             Toast.makeText(getApplicationContext(), "Messages can't be empty", Toast.LENGTH_SHORT).show();
             return;
         }
+        if (mInputDestView.getText().toString().isEmpty()) {
+            Toast.makeText(getApplicationContext(), "Messages need to have a destination", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (mInputDestView.getText().toString().equals(SessionInfo.getInstance().getUsername())) {
+            Toast.makeText(getApplicationContext(), "You can't send messages to yourself", Toast.LENGTH_SHORT).show();
+            return;
+        }
         String username = SessionInfo.getInstance().getUsername();
         String message = mInputMessageView.getText().toString().trim();
+        String destName = mInputDestView.getText().toString().trim();
         mInputMessageView.setText("");
-        addMessage(username, message, true);
-        String protocolForm = MessageInfo.createTextMessageString(username, message);
-        MessageQueue.getInstance().addMessage(protocolForm);
+        mInputDestView.setText("");
+        addMessage(username, destName, message, true);
+        String protocolForm = MessageInfo.createTextMessageString(username, destName, message);
+        RegMessageQueue.getInstance().addMessage(protocolForm);
     }
 
 
     // Adds a text message to the screen
     // If sending == false, then we shouldn't scroll to the bottom of the page
-    private void addMessage(String username, String message, boolean sending) {
+    private void addMessage(String username, String destName, String message, boolean sending) {
         mMessages.add(new Message.Builder(Message.TYPE_MESSAGE)
-                .username(username).message(message).build());
+                .username(username).destName(destName).message(message).build());
         mAdapter.notifyItemInserted(mMessages.size() - 1);
         if (!sending) {
             Toast.makeText(getApplicationContext(), "New Message", Toast.LENGTH_SHORT).show();

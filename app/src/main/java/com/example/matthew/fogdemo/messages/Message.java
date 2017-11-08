@@ -13,6 +13,7 @@ public class Message {
     private int mType;
     private String mMessage;
     private String mUsername;
+    private String mDestName;
 
     private Message() {}
 
@@ -28,11 +29,15 @@ public class Message {
         return mUsername;
     };
 
+    public String getDestName() {
+        return mDestName;
+    }
 
     public static class Builder {
         private final int mType;
         private String mUsername;
         private String mMessage;
+        private String mDestName;
 
         public Builder(int type) {
             mType = type;
@@ -40,6 +45,11 @@ public class Message {
 
         public Builder username(String username) {
             mUsername = username;
+            return this;
+        }
+
+        public Builder destName(String destName) {
+            mDestName = destName;
             return this;
         }
 
@@ -53,6 +63,7 @@ public class Message {
             message.mType = mType;
             message.mUsername = mUsername;
             message.mMessage = mMessage;
+            message.mDestName = mDestName;
             return message;
         }
     }

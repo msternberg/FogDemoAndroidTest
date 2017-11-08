@@ -7,7 +7,7 @@ package com.example.matthew.fogdemo.messages;
 public class MessageInfo {
 
     public enum MessageType {
-        TEXT, USERS_NUM,
+        TEXT, USERS_NUM, MULE
     }
 
     public static MessageType determineMessageType(String data) {
@@ -16,6 +16,8 @@ public class MessageInfo {
         }
         if (data.substring(0, 4).equals("TEXT")) {
             return MessageType.TEXT;
+        } else if (data.substring(0, 4).equals("MULE")) {
+            return MessageType.MULE;
         } else {
             return MessageType.USERS_NUM;
         }
@@ -32,11 +34,17 @@ public class MessageInfo {
     }
 
     public static String createTextMessageString(TextMessage message) {
-        return createTextMessageString(message.getUsername(), message.getText());
+        return createTextMessageString(message.getUsername(), message.getDestName(), message.getText());
     }
 
-    public static String createTextMessageString(String username, String contents) {
-        String res = String.format("SENDTO %s %s", username, contents);
+    public static String createTextMessageString(String username, String destName, String contents) {
+        String res = String.format("SENDTO %s %s %s", username, destName, contents);
         return res;
+    }
+
+    public static int getFQIDFromMuleString(String message) {
+        message = message.substring(5);
+        int FQID = Integer.parseInt(message.split(" ")[0]);
+        return FQID;
     }
 }

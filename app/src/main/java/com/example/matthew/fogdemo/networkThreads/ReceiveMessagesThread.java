@@ -1,9 +1,12 @@
 package com.example.matthew.fogdemo.networkThreads;
 
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.matthew.fogdemo.ChatActivity;
+import com.example.matthew.fogdemo.SessionInfo;
 import com.example.matthew.fogdemo.messages.MessageInfo;
+import com.example.matthew.fogdemo.messages.MuleMessage;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -58,6 +61,16 @@ public class ReceiveMessagesThread extends Thread {
                             }
                         });
                     }
+
+                    // If the returned object is a MULE message, put it in the MULE message list
+                    if (messageType == MessageInfo.MessageType.MULE) {
+                        //Set the current known FogQueueID to the MULE's FQID
+                        int fqId = MessageInfo.getFQIDFromMuleString(data);
+                        SessionInfo.getInstance().setCurrFogQ(fqId);
+                        SessionInfo.getInstance().addMuleMessage(MuleMessage.buildFromProtocolMessage(data));
+                        Log.i("RECEIVE MESSAGES THREAD", "RECEIVED A MULE MESSAGE");
+                    }
+
                 // If the returned object is a USERS message, change the number of users in the main ui thread
                     if (messageType == MessageInfo.MessageType.USERS_NUM) {
                         chatActivity.runOnUiThread(new Runnable() {

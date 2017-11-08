@@ -2,7 +2,8 @@ package com.example.matthew.fogdemo.networkThreads;
 
 import android.util.Log;
 
-import com.example.matthew.fogdemo.MessageQueue;
+import com.example.matthew.fogdemo.RegMessageQueue;
+import com.example.matthew.fogdemo.SessionInfo;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -37,12 +38,12 @@ public class FogIPThread extends Thread {
         /* This MUST be called when the thread is created to make sure that the Android
            device can connect to the Raspberry Pi, which will be used to obtain the Fog Ip
             addresses */
-        raspberryIP = "192.168.42.61";
+        raspberryIP = SessionInfo.getInstance().getRaspIP();
     }
 
 
     // Pull the IP address of the Fog Node from the Raspberry Pi
-    // Update the MessageQueue FogIP field to the pull value
+    // Update the RegMessageQueue FogIP field to the pull value
 
     /* If we can't connect to the Raspberry Pi, call initializeRaspberryConnection()
        wait 3 seconds, and then skip to the next iteration of the loop
@@ -74,7 +75,7 @@ public class FogIPThread extends Thread {
                 // Read back the response from the raspberry pi, which should indicate the IP of the Fog device
                 String raspResponse = bufferedReader.readLine();
                 if (!raspResponse.equals("")) {
-                    MessageQueue.getInstance().setFogIP(raspResponse);
+                    RegMessageQueue.getInstance().setFogIP(raspResponse);
                 }
                 raspSocket.close();
 

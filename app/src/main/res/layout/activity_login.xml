@@ -12,6 +12,19 @@
         android:orientation="vertical">
 
         <EditText
+            android:id="@+id/rpi_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Raspberry Pi IP"
+            android:imeActionId="@+id/login"
+            android:layout_marginBottom="40dp"
+            android:imeActionLabel="@string/action_sign_in_short"
+            android:imeOptions="actionUnspecified"
+            android:inputType="textPersonName"
+            android:maxLength="14"
+            android:maxLines="1" />
+
+        <EditText
             android:id="@+id/username_input"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -21,8 +34,8 @@
             android:imeOptions="actionUnspecified"
             android:inputType="textPersonName"
             android:maxLength="14"
-            android:maxLines="1"
-            android:singleLine="true"/>
+            android:maxLines="1" />
+
         <Button
             android:id="@+id/sign_in_button"
             style="?android:textAppearanceSmall"

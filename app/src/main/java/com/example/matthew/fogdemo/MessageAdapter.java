@@ -6,6 +6,7 @@ package com.example.matthew.fogdemo;
 
 
 import android.content.Context;
+import android.content.pm.PackageInstaller;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -51,7 +52,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Message message = mMessages.get(position);
         viewHolder.setMessage(message.getMessage());
-        viewHolder.setUsername(message.getUsername());
+        viewHolder.setUsername(message.getUsername() + " to " + message.getDestName());
     }
 
     @Override
@@ -87,12 +88,19 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
         }
 
         private int getUsernameColor(String username) {
-            int hash = 7;
+            int index = -1;
+            if (username.equals(SessionInfo.getInstance().getUsername())) {
+                index = 0;
+            } else {
+                index = 1;
+            }
+            return mUsernameColors[index];
+            /*int hash = 7;
             for (int i = 0, len = username.length(); i < len; i++) {
                 hash = username.codePointAt(i) + (hash << 5) - hash;
             }
             int index = Math.abs(hash % mUsernameColors.length);
-            return mUsernameColors[index];
+            return mUsernameColors[index]; */
         }
     }
 }
