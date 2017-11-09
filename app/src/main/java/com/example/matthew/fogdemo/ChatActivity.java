@@ -15,6 +15,7 @@ import android.widget.Toast;
 
 import com.example.matthew.fogdemo.messages.Message;
 import com.example.matthew.fogdemo.messages.MessageInfo;
+import com.example.matthew.fogdemo.messages.MuleMessage;
 import com.example.matthew.fogdemo.messages.TextMessage;
 import com.example.matthew.fogdemo.networkThreads.FogIPThread;
 import com.example.matthew.fogdemo.networkThreads.MuleThread;
@@ -31,17 +32,22 @@ public class ChatActivity extends AppCompatActivity {
     private EditText mInputDestView;
     private List<Message> mMessages = new ArrayList<Message>();
     private RecyclerView.Adapter mAdapter;
+    private SendMessagesThread sendMessagesThread;
+    private ReceiveMessagesThread receiveThread;
+    private MuleThread muleThread;
 
 
     //////////////////////////////////////////////////////////////
 
-    private static final String FOG_IP = "128.61.114.166";
+    private static final String FOG_IP = "10.0.0.4";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        Log.v("STARTING NEW ACTIVITY", "Yay");
 
         mAdapter = new MessageAdapter(getApplicationContext(), mMessages);
 
@@ -61,8 +67,8 @@ public class ChatActivity extends AppCompatActivity {
         });
 
         Log.d("MESSAGES THREAD", "CREATING MESSAGES THREAD");
-        SendMessagesThread t = new SendMessagesThread(FOG_IP);
-        t.start();
+        sendMessagesThread = new SendMessagesThread(FOG_IP);
+        sendMessagesThread.start();
         Log.d("MESSAGES THREAD", "RUNNING MESSAGES THREAD");
 
 
@@ -71,10 +77,10 @@ public class ChatActivity extends AppCompatActivity {
         fogThread.start();
 
         Log.d("RECEIVER THREAD", "STARTING RECEIVER THREAD");
-        ReceiveMessagesThread receiveThread = new ReceiveMessagesThread(this);
+        receiveThread = new ReceiveMessagesThread(this);
         receiveThread.start();
 
-        MuleThread muleThread = new MuleThread();
+        muleThread = new MuleThread();
         muleThread.start();
     }
 
@@ -103,6 +109,7 @@ public class ChatActivity extends AppCompatActivity {
     public void onReceiveTextMessage(String message) {
         TextMessage m = TextMessage.parseMessage(message);
         // Display the new message on the screen
+        Log.v("TEXT MESSAGE TO SCREEN", m.getText());
         addMessage(m.getUsername(), m.getDestName(), m.getText(), false);
     }
 
@@ -178,6 +185,8 @@ public class ChatActivity extends AppCompatActivity {
     public void onBackPressed() {
         sendLeaveMessage();
         Toast.makeText(getApplicationContext(),  "LEAVING CHAT", Toast.LENGTH_SHORT).show();
+        sendMessagesThread.kill();
+
         SessionInfo.getInstance().setUsername(null);
         super.onBackPressed();
     }

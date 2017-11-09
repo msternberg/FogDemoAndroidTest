@@ -1,5 +1,10 @@
 package com.example.matthew.fogdemo.messages;
 
+import android.app.Activity;
+import android.app.Application;
+import android.util.Log;
+import android.widget.Toast;
+
 /**
  * Created by Matt on 11/3/2017.
  */
@@ -10,7 +15,7 @@ public class TextMessage {
     private String text;
     private String destName;
 
-    private TextMessage(String user, String text, String destName) {
+    private TextMessage(String user, String destName, String text) {
         this.username = user;
         this.text = text;
         this.destName = destName;
@@ -42,6 +47,7 @@ public class TextMessage {
         String destName = networkMessage.split(" ")[1];
         int length = username.length() + destName.length() + 2;
         String text = networkMessage.substring(length);
+        Log.d("MAKING TEXT MESSAGE", text);
         return buildMessage(username, destName, text);
     }
 

@@ -43,6 +43,9 @@ public class ReceiveMessagesThread extends Thread {
         // LOOP FOREVER:
         // Listen for messages on port RECEIVE_PORT
         while (true) {
+            if (isInterrupted()) {
+                break;
+            }
             try {
                 Socket clientConnection = listener.accept();
                 try {

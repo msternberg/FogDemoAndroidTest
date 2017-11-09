@@ -56,8 +56,11 @@ public class MuleThread extends Thread {
          Individually check each MuleMessage to see if its FQID equals that of the
          current Fog Queue. If it doesn't, then send, otherwise put it back in the SessionInfo
          MuleMessages list */
-        ArrayList<MuleMessage> muleList= SessionInfo.getInstance().getMuleMessages();
         while (true) {
+            if (isInterrupted()) {
+                break;
+            }
+            ArrayList<MuleMessage> muleList= SessionInfo.getInstance().getMuleMessages();
             try {
                 Thread.sleep(2000);
                 Log.d("SEND MULE THREAD", "ABOUT TO SEND MULE MESSAGES");
@@ -75,5 +78,6 @@ public class MuleThread extends Thread {
                 e.printStackTrace();
             }
         }
+
     }
 }

@@ -23,6 +23,7 @@ import java.util.Queue;
 public class SendMessagesThread extends Thread {
 
     private final int FOG_PORT = 3000;
+    private boolean killThread = false;
 
     public SendMessagesThread(String fogIP) {
         RegMessageQueue.getInstance().setFogIP(fogIP);
@@ -42,7 +43,7 @@ public class SendMessagesThread extends Thread {
         String fogIp = RegMessageQueue.getInstance().getFogIP();
         InetAddress fogAddr = InetAddress.getByName(fogIp);
         Socket fogSocket = new Socket();
-        fogSocket.connect(new InetSocketAddress(fogAddr, FOG_PORT), 500);;
+        fogSocket.connect(new InetSocketAddress(fogAddr, FOG_PORT), 500);
         try {
             PrintWriter printWriter = new PrintWriter(new OutputStreamWriter(fogSocket.getOutputStream()));
 
@@ -55,28 +56,46 @@ public class SendMessagesThread extends Thread {
 
             // Get the HBR response from the FogQueue - Format: HBR (fqid)
             // Every time an enter message is sent, the Fog Queue sends an HBR response on the same connection
+            fogSocket.setSoTimeout(10);
             BufferedReader reader = new BufferedReader(new InputStreamReader(fogSocket.getInputStream()));
             String hbr = reader.readLine();
             // Get the FQId from the HBR message
+            if (hbr == null) {
+                throw new Exception();
+            }
             int fqid = Integer.parseInt(hbr.split(" ")[1]);
             SessionInfo.getInstance().setCurrFogQ(fqid);
             Log.d("HBR RESPONSE", "SUCCESSFULLY RECEIVED HBR RESPONSE FROM FOQ QUEUE WITH FQID #" + fqid);
 
+            fogSocket.close();
+            Log.d("SEND QUEUE", "FIRST ELEMENT OF MESSAGE QUEUE: "  + messages.peek());
             for (String message : messages) {
+                fogSocket = new Socket();
+                fogSocket.connect(new InetSocketAddress(fogAddr, FOG_PORT), 500);
+                printWriter = new PrintWriter(new OutputStreamWriter(fogSocket.getOutputStream()));
+
                 printWriter.write(message);
                 printWriter.flush();
+
+                fogSocket.close();
+                Log.d("SEND QUEUE", "SENT OUT SENDTO MESSAGE");
             }
         } catch (Exception e) {
             fogSocket.close();
-            throw e;
+            Log.d("SEND QUEUE", "SOMETHING HAPPENED");
         }
         fogSocket.close();
     }
 
+    public void kill() {
+        this.killThread = true;
+        Log.d("KILL SENDING THREAD", "KILL SENDING THREAD");
+    }
+
     @Override
     public void run() {
-        RegMessageQueue messageQueue = RegMessageQueue.getInstance();
-        while (true) {
+        while (!killThread) {
+            RegMessageQueue messageQueue = RegMessageQueue.getInstance();
             try {
                 Thread.sleep(2000);
                 Log.d("SEND MESSAGE THREAD", "ABOUT TO UNLOAD MESSAGE QUEUE");
@@ -84,12 +103,13 @@ public class SendMessagesThread extends Thread {
                 try {
                     sendMessages(messagesWaiting);
                 } catch (IOException e) {
-                    Log.d("FOG IP", "CAN'T CREATE CONNECTION WITH FOG DEVICE");
+                    Log.d("FOG IP", "CAN'T CREATE CONNECTION WITH FOG DEVICE WITH IP " + RegMessageQueue.getInstance().getFogIP());
                     repopulateMessages(messagesWaiting);
                 }
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        Log.d("SENDING DONE", "USER ISN'T SENDING ANY MORE MESSAGES");
     }
 }
