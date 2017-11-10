@@ -35,6 +35,7 @@ public class ChatActivity extends AppCompatActivity {
     private SendMessagesThread sendMessagesThread;
     private ReceiveMessagesThread receiveThread;
     private MuleThread muleThread;
+    private FogIPThread fogIPThread;
 
 
     //////////////////////////////////////////////////////////////
@@ -71,8 +72,8 @@ public class ChatActivity extends AppCompatActivity {
 
 
         Log.d("FOG IP THREAD", "STARTING FOG IP THREAD");
-        FogIPThread fogThread = new FogIPThread();
-        fogThread.start();
+        fogIPThread = new FogIPThread();
+        fogIPThread.start();
 
         Log.d("RECEIVER THREAD", "STARTING RECEIVER THREAD");
         receiveThread = new ReceiveMessagesThread(this);
@@ -174,17 +175,16 @@ public class ChatActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        sendLeaveMessage();
-        Toast.makeText(getApplicationContext(), "USER DESTROYED", Toast.LENGTH_SHORT).show();
         SessionInfo.getInstance().setUsername(null);
         super.onDestroy();
     }
 
     @Override
     public void onBackPressed() {
-        sendLeaveMessage();
-        Toast.makeText(getApplicationContext(),  "LEAVING CHAT", Toast.LENGTH_SHORT).show();
         sendMessagesThread.kill();
+        receiveThread.kill();
+        muleThread.kill();
+        fogIPThread.kill();
 
         SessionInfo.getInstance().setUsername(null);
         super.onBackPressed();

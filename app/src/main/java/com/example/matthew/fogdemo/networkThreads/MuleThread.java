@@ -25,6 +25,7 @@ import java.util.Queue;
 public class MuleThread extends Thread {
 
     private final int FOG_PORT = 3000;
+    private boolean kill = false;
 
     private void sendMessage(MuleMessage muleMessage) throws IOException {
 
@@ -50,13 +51,17 @@ public class MuleThread extends Thread {
         }
     }
 
+    public void kill() {
+        kill = true;
+    }
+
     @Override
     public void run() {
         /* Loop every 2 seconds to try to send out messages from the mule list
          Individually check each MuleMessage to see if its FQID equals that of the
          current Fog Queue. If it doesn't, then send, otherwise put it back in the SessionInfo
          MuleMessages list */
-        while (true) {
+        while (!kill) {
             if (isInterrupted()) {
                 break;
             }

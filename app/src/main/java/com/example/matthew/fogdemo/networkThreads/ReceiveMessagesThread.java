@@ -28,6 +28,11 @@ public class ReceiveMessagesThread extends Thread {
 
 
     private final int RECEIVE_PORT = 1500;
+    private boolean kill = false;
+
+    public void kill() {
+        kill = true;
+    }
 
     @Override
     public void run() {
@@ -42,7 +47,7 @@ public class ReceiveMessagesThread extends Thread {
         } while (listener == null);
         // LOOP FOREVER:
         // Listen for messages on port RECEIVE_PORT
-        while (true) {
+        while (!kill) {
             if (isInterrupted()) {
                 break;
             }

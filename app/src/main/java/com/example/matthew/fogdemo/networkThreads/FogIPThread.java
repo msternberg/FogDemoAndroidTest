@@ -27,6 +27,7 @@ public class FogIPThread extends Thread {
     private int raspPort = 4000;
     private final String FOG_IP_REQUEST = "ANDROID REQ";
     private final String endMessage = "\r\n";
+    private boolean kill = false;
 
     public FogIPThread() {
         super();
@@ -41,6 +42,10 @@ public class FogIPThread extends Thread {
         raspberryIP = SessionInfo.getInstance().getRaspIP();
     }
 
+    public void kill() {
+        kill = true;
+    }
+
 
     // Pull the IP address of the Fog Node from the Raspberry Pi
     // Update the RegMessageQueue FogIP field to the pull value
@@ -51,7 +56,7 @@ public class FogIPThread extends Thread {
     @Override
     public void run() {
         // Cycle every 3 seconds:
-        while(true) {
+        while(!kill) {
             try {
                 sleep(3000);
                 // Establish a connection with the raspberry pi
