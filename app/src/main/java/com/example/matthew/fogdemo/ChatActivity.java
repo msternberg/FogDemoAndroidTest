@@ -39,15 +39,13 @@ public class ChatActivity extends AppCompatActivity {
 
     //////////////////////////////////////////////////////////////
 
-    private static final String FOG_IP = "10.0.0.4";
+    private static final String FOG_IP = "128.61.126.9";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
-
-        Log.v("STARTING NEW ACTIVITY", "Yay");
 
         mAdapter = new MessageAdapter(getApplicationContext(), mMessages);
 
@@ -110,6 +108,7 @@ public class ChatActivity extends AppCompatActivity {
         TextMessage m = TextMessage.parseMessage(message);
         // Display the new message on the screen
         Log.v("TEXT MESSAGE TO SCREEN", m.getText());
+        Toast.makeText(getApplicationContext(), m.getText(),Toast.LENGTH_LONG).show();
         addMessage(m.getUsername(), m.getDestName(), m.getText(), false);
     }
 

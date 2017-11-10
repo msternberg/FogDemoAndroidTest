@@ -52,7 +52,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
     public void onBindViewHolder(ViewHolder viewHolder, int position) {
         Message message = mMessages.get(position);
         viewHolder.setMessage(message.getMessage());
-        viewHolder.setUsername(message.getUsername() + " to " + message.getDestName());
+        viewHolder.setUsername(message.getUsername());
     }
 
     @Override
@@ -92,7 +92,7 @@ public class MessageAdapter extends RecyclerView.Adapter<MessageAdapter.ViewHold
             if (username.equals(SessionInfo.getInstance().getUsername())) {
                 index = 0;
             } else {
-                index = 1;
+                index = 4;
             }
             return mUsernameColors[index];
             /*int hash = 7;
